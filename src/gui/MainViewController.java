@@ -14,6 +14,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import model.services.DepartmentService;
 
 public class MainViewController implements Initializable{
 
@@ -33,7 +34,7 @@ public class MainViewController implements Initializable{
     
     @FXML
     public void onMenuItemDepartmentAction(){
-        loadView("/gui/DepartmentList.fxml");
+        loadView2("/gui/DepartmentList.fxml");
     }
     
     @FXML
@@ -58,6 +59,31 @@ public class MainViewController implements Initializable{
             mainVBox.getChildren().clear();
             mainVBox.getChildren().add(mainMenu);
             mainVBox.getChildren().addAll(newVBox.getChildren());
+            
+        } catch (IOException ex) {
+            Alerts.showAlert("IO Exception", "Error loading view", ex.getMessage(), AlertType.ERROR);
+        }
+    }
+    
+    private synchronized void loadView2(String absoluteName){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            VBox newVBox = loader.load();
+            
+            Scene mainScene = Main.getMainScene();
+            VBox mainVBox = (VBox)((ScrollPane)mainScene.getRoot()).getContent();//pega o primeiro elemento da view o ScrollPane
+            
+            Node mainMenu = mainVBox.getChildren().get(0);
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(mainMenu);
+            mainVBox.getChildren().addAll(newVBox.getChildren());
+            
+            // pega a referencia para o controller da view 
+            DepartmentListController controller = loader.getController();
+            // injetar a dependecia do Service la no controller
+            controller.setDepartmentService(new DepartmentService());
+            // chamando para atualizar os dados na tela do table view
+            controller.updateTableView();
             
         } catch (IOException ex) {
             Alerts.showAlert("IO Exception", "Error loading view", ex.getMessage(), AlertType.ERROR);
