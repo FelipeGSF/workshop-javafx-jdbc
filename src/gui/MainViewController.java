@@ -35,16 +35,20 @@ public class MainViewController implements Initializable{
     
     @FXML
     public void onMenuItemDepartmentAction(){
+        //loadView2("/gui/DepartmentList.fxml");
+        
+        //Ação de inicialização do controller DepartmentListController
         // o segundo parametro é uma expressao LAMBDA que vai receber um parametro DepartmentListController
         loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
-            controller.setDepartmentService(new DepartmentService());
-            controller.updateTableView();
+            controller.setDepartmentService(new DepartmentService());//função de inicialização do controlador
+            controller.updateTableView();//atualiza a tableView
         });
     }
     
     @FXML
     public void onMenuItemAboutAction(){
-        loadView("/gui/About.fxml", x -> {});
+        loadView("/gui/About.fxml", x -> {});//ação de inicialização declarando uma função x que nao leva a nada
+        //loadView2("/gui/About.fxml");
     }
     
     @Override
@@ -61,11 +65,17 @@ public class MainViewController implements Initializable{
             VBox newVBox = loader.load();
             
             Scene mainScene = Main.getMainScene();
+            
+            //pega referencia para o VBox da janela principal
             VBox mainVBox = (VBox)((ScrollPane)mainScene.getRoot()).getContent();//pega o primeiro elemento da view o ScrollPane
             
+            //guarda uma referencia para o main menu
             Node mainMenu = mainVBox.getChildren().get(0);
+            //limpa todos os filhos do main VBox
             mainVBox.getChildren().clear();
+            //adiciona o main menu
             mainVBox.getChildren().add(mainMenu);
+            //adiciona os filhos do new VBox
             mainVBox.getChildren().addAll(newVBox.getChildren());
             
             // o getController() vai retornar o controlador do tipo que 
@@ -79,4 +89,33 @@ public class MainViewController implements Initializable{
             Alerts.showAlert("IO Exception", "Error loading view", ex.getMessage(), AlertType.ERROR);
         }
     }
+    
+    //Este loadView carrega o MOCK DATA para testes
+//    private synchronized void loadView2(String absoluteName){
+//        try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+//            VBox newVBox = loader.load();
+//            
+//            Scene mainScene = Main.getMainScene();
+//            
+//            //pega referencia para o VBox da janela principal
+//            VBox mainVBox = (VBox)((ScrollPane)mainScene.getRoot()).getContent();//pega o primeiro elemento da view o ScrollPane
+//            
+//            //guarda uma referencia para o main menu
+//            Node mainMenu = mainVBox.getChildren().get(0);
+//            //limpa todos os filhos do main VBox
+//            mainVBox.getChildren().clear();
+//            //adiciona o main menu
+//            mainVBox.getChildren().add(mainMenu);
+//            //adiciona os filhos do new VBox
+//            mainVBox.getChildren().addAll(newVBox.getChildren());
+//            
+//            DepartmentListController controller = loader.getController();
+//            controller.setDepartmentService(new DepartmentService());//injeta a dependencia do Service no controller
+//            controller.updateTableView();
+//            
+//        } catch (IOException ex) {
+//            Alerts.showAlert("IO Exception", "Error loading view", ex.getMessage(), AlertType.ERROR);
+//        }
+//    }
 }

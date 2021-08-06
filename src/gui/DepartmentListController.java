@@ -1,17 +1,26 @@
 package gui;
 
 import application.Main;
+import gui.util.Alerts;
+import gui.util.Utils;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
@@ -24,24 +33,26 @@ public class DepartmentListController implements Initializable{
     private DepartmentService service;
     
     @FXML
-    private TableView<Department> tableViewDepartment;
+    private TableView<Department> tableViewDepartment;//cria referencia para a tableview do tipo department
+    
+    @FXML//table column pede dois tipos. Um é o tipo da entidade (Department) e o outro é o tipo da coluna id (Integer)
+    private TableColumn<Department, Integer> tableColumnId;//cria referencia para a coluna id
     
     @FXML
-    private TableColumn<Department, Integer> tableColumnId;
+    private TableColumn<Department, String> tableColumnName;//cria referencia para a coluna name
     
     @FXML
-    private TableColumn<Department, String> tableColumnName;
-    
-    @FXML
-    private Button btNew;
+    private Button btNew;//cria referencia do Button New
     
     
     @FXML // este ObservableList será associado ao TableView para mostrar os departamentos na tela
     private ObservableList<Department> obsList;
     
     @FXML
-    public void onBtNewAction(){
-        System.out.println("onBtNewAction");
+    public void onBtNewAction(ActionEvent event){
+        Stage parentStage = Utils.currentStage(event);
+        createDialogForm("/gui/DepartmentForm.fxml", parentStage);
+//        System.out.println("onBtNewAction");
     }
     
     /** INVERSÃO DE CONTROLE. não dando o "= new DepartmentService();" direto na classe 
@@ -54,14 +65,20 @@ public class DepartmentListController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        initializeNodes();
+        initializeNodes();//metodo auxiliar para iniciar componentes da tela
     }
-
+    
+    //comando para iniar apropriadamente o comportamento das colunas da tabela
     private void initializeNodes() {
+        //padrao do JavaFX para iniciar o comportamento das colunas
         tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         
-        Stage stage = (Stage)Main.getMainScene().getWindow();
+        //para a tableview acompanhar o tamanho da janela
+        Stage stage = (Stage)Main.getMainScene().getWindow();//a função getWindows pega a referencia para a janela
+        //Window é uma superclasse de Stage portanto o downcasting é necessario
+        
+        //para a table view acompanhar a altura da janela
         tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
     }
     
@@ -77,10 +94,30 @@ public class DepartmentListController implements Initializable{
         
         // esta list recupera os Departamentos do DepartmentService
         List<Department> list = service.findAll();
+        
         // carrega a list no ObservableList
         obsList = FXCollections.observableArrayList(list);
+        
         // chama o TableView e carrega os itens da obsList na TableView
         tableViewDepartment.setItems(obsList);
+    }
+    
+    private void createDialogForm(String absoluteName, Stage parentStage){
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            Pane pane = loader.load();
+            
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Enter Department Data");
+            dialogStage.setScene(new Scene(pane));
+            dialogStage.setResizable(false);
+            dialogStage.initOwner(parentStage);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.showAndWait();
+            
+        }catch(IOException ioe){
+            Alerts.showAlert("IO Exception", "Error loading view", ioe.getMessage(), AlertType.ERROR);
+        }
     }
     
 }

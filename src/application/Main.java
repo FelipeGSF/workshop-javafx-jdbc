@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     
+    //expoe a referencia da scene
     private static Scene mainScene;
     
     @Override
@@ -29,6 +30,7 @@ public class Main extends Application {
         }
     }
 
+    //pega a scene estatica exposta
     public static Scene getMainScene(){
         return mainScene;
     }
