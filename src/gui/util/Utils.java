@@ -21,4 +21,12 @@ public class Utils {
         //ex.: se clicar em um botao vai pegar o evento do botao
         return (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
+    
+    public static Integer tryParseToInt(String str){
+        try{
+            return Integer.parseInt(str);
+        }catch(NumberFormatException nfe){
+            return null;
+        }
+    }
 }
